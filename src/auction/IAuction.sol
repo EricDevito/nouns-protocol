@@ -21,6 +21,10 @@ interface IAuction is IUUPS, IOwnable, IPausable {
     /// @param endTime The end time of the auction
     event AuctionBid(uint256 tokenId, address bidder, uint256 amount, bool extended, uint256 endTime);
 
+    /// @notice Emitted when a bid is placed with comment
+    /// @param comment comment
+    event AuctionBidComment(string comment);
+
     /// @notice Emitted when an auction is settled
     /// @param tokenId The ERC-721 token id of the settled auction
     /// @param winner The address of the winning bidder

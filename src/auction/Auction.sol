@@ -18,7 +18,7 @@ import { VersionedContract } from "../VersionedContract.sol";
 /// @title Auction
 /// @author Rohan Kulkarni
 /// @notice A DAO's auction house
-/// @custom:repo github.com/ourzora/nouns-protocol 
+/// @custom:repo github.com/ourzora/nouns-protocol
 /// Modified from:
 /// - NounsAuctionHouse.sol commit 2cbe6c7 - licensed under the BSD-3-Clause license.
 /// - Zora V3 ReserveAuctionCoreEth module commit 795aeca - licensed under the GPL-3.0 license.
@@ -60,13 +60,7 @@ contract Auction is IAuction, VersionedContract, UUPS, Ownable, ReentrancyGuard,
     /// @param _treasury The treasury address where ETH will be sent
     /// @param _duration The duration of each auction
     /// @param _reservePrice The reserve price of each auction
-    function initialize(
-        address _token,
-        address _founder,
-        address _treasury,
-        uint256 _duration,
-        uint256 _reservePrice
-    ) external initializer {
+    function initialize(address _token, address _founder, address _treasury, uint256 _duration, uint256 _reservePrice) external initializer {
         // Ensure the caller is the contract manager
         if (msg.sender != address(manager)) revert ONLY_MANAGER();
 
@@ -97,6 +91,20 @@ contract Auction is IAuction, VersionedContract, UUPS, Ownable, ReentrancyGuard,
     /// @notice Creates a bid for the current token
     /// @param _tokenId The ERC-721 token id
     function createBid(uint256 _tokenId) external payable nonReentrant {
+        _handleBid(_tokenId, '');
+    }
+
+    /// @notice Creates a bid for the current token with comment
+    /// @param _tokenId The ERC-721 token id
+    /// @param _comment comment to include in the Auction.AuctionBidComment event
+    function createBidWithComment(uint256 _tokenId, string calldata _comment) external payable nonReentrant {
+        _handleBid(_tokenId, _comment);
+    }
+
+    /// @notice Logic for creating bids
+    /// @param _tokenId The ERC-721 token id
+    /// @param _comment comment to include in the Auction.AuctionBidComment event
+    function _handleBid(uint256 _tokenId, string memory comment) external payable nonReentrant {
         // Ensure the bid is for the current token
         if (auction.tokenId != _tokenId) {
             revert INVALID_TOKEN_ID();
@@ -169,6 +177,10 @@ contract Auction is IAuction, VersionedContract, UUPS, Ownable, ReentrancyGuard,
         }
 
         emit AuctionBid(_tokenId, msg.sender, msgValue, extend, auction.endTime);
+
+        if (bytes(comment).length > 0) {
+            emit AuctionBidComment(comment);
+        }
     }
 
     ///                                                          ///
