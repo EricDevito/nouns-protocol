@@ -22,7 +22,7 @@ interface IAuction is IUUPS, IOwnable, IPausable {
     event AuctionBid(uint256 tokenId, address bidder, uint256 amount, bool extended, uint256 endTime);
 
     /// @notice Emitted when a bid is placed with comment
-    /// @param comment comment
+    /// @param comment The comment attached to bid
     event AuctionBidComment(string comment);
 
     /// @notice Emitted when an auction is settled

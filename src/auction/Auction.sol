@@ -104,7 +104,7 @@ contract Auction is IAuction, VersionedContract, UUPS, Ownable, ReentrancyGuard,
     /// @notice Logic for creating bids
     /// @param _tokenId The ERC-721 token id
     /// @param _comment comment to include in the Auction.AuctionBidComment event
-    function _handleBid(uint256 _tokenId, string memory comment) external payable nonReentrant {
+    function _handleBid(uint256 _tokenId, string memory _comment) external payable nonReentrant {
         // Ensure the bid is for the current token
         if (auction.tokenId != _tokenId) {
             revert INVALID_TOKEN_ID();
@@ -178,8 +178,8 @@ contract Auction is IAuction, VersionedContract, UUPS, Ownable, ReentrancyGuard,
 
         emit AuctionBid(_tokenId, msg.sender, msgValue, extend, auction.endTime);
 
-        if (bytes(comment).length > 0) {
-            emit AuctionBidComment(comment);
+        if (bytes(_comment).length > 0) {
+            emit AuctionBidComment(_comment);
         }
     }
 
