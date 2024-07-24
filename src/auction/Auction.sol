@@ -141,23 +141,38 @@ contract Auction is IAuction, VersionedContract, UUPS, Ownable, ReentrancyGuard,
     ///                          CREATE BID                      ///
     ///                                                          ///
 
+    /// @notice Creates a bid for the current token with comment
+    /// @param _tokenId The ERC-721 token id
+    /// @param _comment comment to include in the Auction.AuctionBidComment event
+    function createBidWithComment(uint256 _tokenId, string calldata _comment) external payable nonReentrant {
+        _createBid(_tokenId, _comment);
+    }
+
+    /// @notice Creates a bid for the current token with comment
+    /// @param _tokenId The ERC-721 token id
+    /// @param _comment comment to include in the Auction.AuctionBidComment event
+    function createBidWithReferralAndComment(uint256 _tokenId, address _referral, string calldata _comment) external payable nonReentrant {
+        currentBidReferral = _referral;
+        _createBid(_tokenId, _comment);
+    }
+
     /// @notice Creates a bid for the current token
     /// @param _tokenId The ERC-721 token id
     function createBidWithReferral(uint256 _tokenId, address _referral) external payable nonReentrant {
         currentBidReferral = _referral;
-        _createBid(_tokenId);
+       _createBid(_tokenId, '');
     }
 
     /// @notice Creates a bid for the current token
     /// @param _tokenId The ERC-721 token id
     function createBid(uint256 _tokenId) external payable nonReentrant {
         currentBidReferral = address(0);
-        _createBid(_tokenId);
+        _createBid(_tokenId, '');
     }
 
     /// @notice Creates a bid for the current token
     /// @param _tokenId The ERC-721 token id
-    function _createBid(uint256 _tokenId) private {
+    function _createBid(uint256 _tokenId, string memory _comment) private {
         // Ensure the bid is for the current token
         if (auction.tokenId != _tokenId) {
             revert INVALID_TOKEN_ID();
